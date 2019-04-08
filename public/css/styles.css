@@ -1,0 +1,39 @@
+.styledGame {
+	margin: 20px auto;
+}
+
+.square {
+	width: 65px;
+	height: 65px;
+	border: 1px solid black;
+}
+
+.dark {
+	background-color: gray;
+}
+
+.light {
+	background-color: orange;
+}
+
+.sqSelected {
+	background-color:#216778;
+}
+
+.sqPossible {
+	background-color: teal;
+}
+
+.attacked {
+	background-color: magenta;
+}
+
+.hidden {
+	background-color: white !important;
+	border-width: 0 !important;
+}
+
+img {
+	max-width: 65px;
+	max-height: 65px;
+}
