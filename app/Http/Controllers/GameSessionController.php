@@ -7,6 +7,8 @@ use App\Entities\GameSubscription;
 use App\Events\GameEvent;
 use App\Events\SubscribeEvent;
 use App\Providers\GameProvider;
+use App\Providers\Helper\AIHandler;
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -51,7 +53,7 @@ class GameSessionController extends Controller
         $session->user_id = Auth::id();
         $session->save();
 
-        return redirect()->route('sessions');
+        return redirect()->route('session.show', $session);
     }
 
     /**
@@ -62,7 +64,6 @@ class GameSessionController extends Controller
     {
         $session->subscribers;
         $session->subscriptions;
-
         $user = Auth::user();
 
         $currentSubscription = @$session->subscriptions->filter(function ($subscription) use ($user) {
@@ -83,8 +84,58 @@ class GameSessionController extends Controller
     }
 
     /**
+     * @param Request $request
      * @param GameSession $session
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
+     */
+    public function subscribeBots(Request $request, GameSession $session)
+    {
+        if ($session->status != 0) {
+            return redirect()->back();
+        }
+
+        $botCount = 4 - $session->subscriptions()->count();
+        collect(AIHandler::BOT_LEVELS[$request->bot_level])->splice(0, $botCount)->each(
+            function ($botName) use ($session) {
+                $otherSubscriptions = $session->subscriptions()->get();
+                $botUser = User::whereName($botName)->firstOrFail();
+                $subscription = new GameSubscription();
+                $subscription->user_id = $botUser->id;
+                $subscription->session_id = $session->id;
+
+                $sides = range(0, 3);
+                foreach ($otherSubscriptions as $otherSubscription) {
+                    unset($sides[$otherSubscription->side - 1]);
+                }
+
+                $subscription->side = array_pop($sides) + 1;
+                $subscription->save();
+                $otherSubscriptions->push($subscription);
+
+                broadcast(new SubscribeEvent($botUser, $session))->toOthers();
+            });
+
+        if ($session->subscriptions->count() === 4) {
+            $session->current_subscription_id = $session->subscriptions[0]->id;
+            $gameProvider = new GameProvider();
+            $session->game_bag = $gameProvider->initGameTable($session);
+            $session->status = 1;
+            $session->save();
+
+            broadcast(new GameEvent($session));
+        }
+
+        $session->subscribers;
+        return redirect()->route('session.show', [
+            'session' => $session,
+        ]);
+    }
+
+    /**
+     * @param GameSession $session
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function subscribe(GameSession $session)
     {
@@ -111,6 +162,7 @@ class GameSessionController extends Controller
             $session->current_subscription_id = $session->subscriptions[0]->id;
             $gameProvider = new GameProvider();
             $session->game_bag = $gameProvider->initGameTable($session);
+            $session->status = 1;
             $session->save();
 
             broadcast(new GameEvent($session));

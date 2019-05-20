@@ -34,5 +34,59 @@ class UsersTableSeeder extends Seeder
             'name' => 'admin3',
             'password' => bcrypt('123456'),
         ]);
+
+        DB::table('users')->insert([
+            'email' => 'bot1@sah.local',
+            'name' => 'BOT Aurel',
+            'password' => bcrypt('123456'),
+        ]);
+
+        DB::table('users')->insert([
+            'email' => 'bot2@sah.local',
+            'name' => 'BOT Calin',
+            'password' => bcrypt('123456'),
+        ]);
+
+        DB::table('users')->insert([
+            'email' => 'bot3@sah.local',
+            'name' => 'BOT Florica',
+            'password' => bcrypt('123456'),
+        ]);
+
+        DB::table('users')->insert([
+            'email' => 'bot4@sah.local',
+            'name' => 'BOT Galina',
+            'password' => bcrypt('123456'),
+        ]);
+
+        DB::table('users')->insert([
+            'email' => 'bot5@sah.local',
+            'name' => 'BOT Mugur',
+            'password' => bcrypt('123456'),
+        ]);
+
+        DB::table('users')->insert([
+            'email' => 'bot6@sah.local',
+            'name' => 'BOT Norocel',
+            'password' => bcrypt('123456'),
+        ]);
+
+        DB::table('users')->insert([
+            'email' => 'bot7@sah.local',
+            'name' => 'BOT Petru',
+            'password' => bcrypt('123456'),
+        ]);
+
+        DB::table('users')->insert([
+            'email' => 'bot8@sah.local',
+            'name' => 'BOT Vadim',
+            'password' => bcrypt('123456'),
+        ]);
+
+        DB::table('users')->insert([
+            'email' => 'bot9@sah.local',
+            'name' => 'BOT Gabi',
+            'password' => bcrypt('123456'),
+        ]);
     }
 }

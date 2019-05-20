@@ -24,12 +24,22 @@
                                     </form>
                                 </div>
                             @endcan
-                            <div class="col-4 form-inline">
+                            <div class="col-3 form-inline">
                                 <label class="custom-control-inline">Initiator:</label>
                                 <input class="form-control" disabled value="{{ $sessionUser->name }}">
                             </div>
-                            <div class="col-7 form-inline">
-
+                            <div class="col-4 form-inline">
+                                @if ($session->subscriptions->count() && $session->status == 0 && $sessionUser->id === $currentUser->id)
+                                    <form class="form-inline" method="POST" action="{{ route('session.subscribe.bots', $session) }}">
+                                        @csrf
+                                        <button class="btn btn-primary mr-3">Start game with bots</button>
+                                        <select name="bot_level" class="form-control">
+                                            <option value="1">Bots level 1</option>
+                                            <option value="2">Bots level 2</option>
+                                            <option value="3">Bots level 3</option>
+                                        </select>
+                                    </form>
+                                @endif
                             </div>
                         </div>
                         <div class="row">

@@ -84,6 +84,6 @@ class GameSession extends Model
      */
     public function currentSubscription()
     {
-        return $this->hasOne(GameSubscription::class);
+        return $this->hasOne(GameSubscription::class, 'session_id');
     }
 }
