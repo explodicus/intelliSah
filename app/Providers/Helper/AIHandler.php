@@ -26,6 +26,11 @@ class AIHandler
         ]
     ];
 
+    public function nextQuery(GameSession $session)
+    {
+        return false;
+    }
+
     public function canonical(GameSession $gameSession)
     {
         $canonical = array_reduce(range(0, 11), function ($carry, $row) {
