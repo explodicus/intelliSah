@@ -38,17 +38,19 @@ class BotAction implements ShouldQueue
     public function handle(GameProvider $gameProvider, AIHandler $aiHandler)
     {
         $session = $this->subscription->session;
-        $subscription = $this->subscription;
+        if ($session->current_subscription_id !== $this->subscription->id) {
+            return;
+        }
 
         $nextQuery = $aiHandler->nextQuery($session);
 //        if (!$nextQuery) {
 //            throw new \Exception("AI can't handle session {$session->id} for bot {$subscription->user->id}");
 //        }
 
-//        list ($positionFrom, $positionTo) = $nextQuery;
-//        if (!$gameProvider->performAction($session, $positionFrom, $positionTo)) {
-//            return;
-//        }
+        list ($positionFrom, $positionTo) = $nextQuery;
+        if (!$gameProvider->performAction($session, $positionFrom, $positionTo)) {
+            throw new \Exception("Unexpected position");
+        }
 
         $failedSubscriptions = $session->fail_subscriptions ?: [];
         if (count($failedSubscriptions) === 3) {

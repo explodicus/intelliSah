@@ -80,10 +80,10 @@ class GameSession extends Model
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function currentSubscription()
     {
-        return $this->hasOne(GameSubscription::class, 'session_id');
+        return $this->belongsTo(GameSubscription::class);
     }
 }

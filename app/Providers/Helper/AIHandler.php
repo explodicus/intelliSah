@@ -5,6 +5,7 @@ namespace App\Providers\Helper;
 
 
 use App\Entities\GameSession;
+use Illuminate\Support\Facades\Log;
 
 class AIHandler
 {
@@ -26,11 +27,32 @@ class AIHandler
         ]
     ];
 
+    /**
+     * @param GameSession $session
+     * @return array
+     * @throws \Exception
+     */
     public function nextQuery(GameSession $session)
     {
-        return false;
+        $cmd = sprintf(
+            "python %s '%s'",
+            base_path('chess-ai-master/play.py'),
+            json_encode($this->canonical($session))
+        );
+
+        Log::error($cmd);
+        $response = shell_exec($cmd);
+        list ($from, $to) = array_values(json_decode($response, JSON_OBJECT_AS_ARRAY));
+        $side = $session->currentSubscription->side;
+
+        return [$this->unFlipFromTopSide($from, $side), $this->unFlipFromTopSide($to, $side)];
     }
 
+    /**
+     * @param GameSession $gameSession
+     * @return mixed
+     * @throws \Exception
+     */
     public function canonical(GameSession $gameSession)
     {
         $canonical = array_reduce(range(0, 11), function ($carry, $row) {
@@ -46,8 +68,7 @@ class AIHandler
                 $canonical[$y][$x] = [
                     'code' => $pieceBag['code'],
                     'ai' => (int)$pieceBag['subscription_id'] === $gameSession->current_subscription_id,
-                    'row' => $y,
-                    'column' => $x,
+                    'position' => [$y, $x],
                 ];
             }
         }
@@ -64,27 +85,60 @@ class AIHandler
     protected function flipToTopSide(array $position, $side)
     {
         list ($y, $x) = $position; // (2, 1) -> (10, 9)
-
         switch ($side) {
             case 3:
                 $x = 11 - $x;
                 $y = 11 - $y;
                 break;
             case 4:
-                $x1 = $x;
-                $x = 11 - $y;
-                $y = $x1;
+                $y1 = $y;
+                $y = $x;
+                $x = 11 - $y1;
                 break;
             case 1:
                 break;
             case 2:
                 $x1 = $x;
-                $x = 11 - $y;
+                $x = $y;
                 $y = 11 - $x1;
                 break;
             default:
                 throw new \Exception("Unexpected side");
         }
+
+        return [$y, $x];
+    }
+
+    /**
+     * @param array $position
+     * @param $side
+     * @return array
+     * @throws \Exception
+     */
+    protected function unFlipFromTopSide(array $position, $side)
+    {
+        list ($y, $x) = $position; // (2, 1) -> (10, 9)
+        switch ($side) {
+            case 3:
+                $x = 11 - $x;
+                $y = 11 - $y;
+                break;
+            case 2:
+                $y1 = $y;
+                $y = $x;
+                $x = 11 - $y1;
+                break;
+            case 1:
+                break;
+            case 4:
+                $x1 = $x;
+                $x = $y;
+                $y = 11 - $x1;
+                break;
+            default:
+                throw new \Exception("Unexpected side");
+        }
+
         return [$y, $x];
     }
 }
