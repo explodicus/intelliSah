@@ -13,7 +13,20 @@
                         @foreach($sessions as $session)
                             <a class="list-group-item" href="{{ route('session.show', [
                                 'session' => $session,
-                            ]) }}">{{ $session->name }}</a>
+                            ]) }}">
+                                <span>{{ $session->name }}</span>
+                                @if ($session->gameover)
+                                    @if ($session->currentSubscription->user_id == \Auth::id())
+                                        <span class="float-right badge badge-success">Win</span>
+                                    @else
+                                        <span class="float-right badge badge-warning">Lose</span>
+                                    @endif
+                                @elseif ($session->status === 0)
+                                    <span class="float-right badge badge-info">Waiting</span>
+                                @else
+                                    <span class="float-right badge badge-primary">Playing</span>
+                                @endif
+                           </a>
                         @endforeach
                     </div>
                 </div>

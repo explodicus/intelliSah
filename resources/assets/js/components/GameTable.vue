@@ -1,10 +1,12 @@
 <template>
     <div class="styledGame">
-        <div v-show="gameover"><span class="text-success mr-1">Game Over!</span></div>
+        <div v-show="gameover"><h3 style="margin: 0 300px 20px" class="text-success">Game Over!</h3></div>
         <div v-for="(row, keyRow) in gameTable" class="row">
             <div v-for="(col, keyCol) in row" v-on:click=""
                     :class="col.class" @click="selectedSq(col)">
-                <template v-if="col.piece"> <img :src="'/images/s' + session.subscriptions[col.piece.subscription_id].side + '_' + col.piece.code + '.png'" > </template>
+                <template v-if="col.piece">
+                    <img :src="'/images/s' + session.subscriptions[col.piece.subscription_id].side + '_' + col.piece.code + '.png'" >
+                </template>
             </div>
         </div>
     </div>
@@ -38,6 +40,9 @@
                     this.gameover = e.session.gameover;
                     this.session.game_bag = e.session.game_bag;
                     this.session.current_subscription_id = e.session.current_subscription_id;
+                    VueEvents.$emit('current-subscription', {
+                        name: this.session.subscribers[this.session.subscriptions[this.session.current_subscription_id].user_id].name,
+                    });
                     this.updateGameTable();
                     if (!this.gameover) {
                         VueEvents.$emit('notification', {
@@ -50,6 +55,7 @@
                     }
                 });
 
+            this.gameover = this.session.gameover;
             this.updateGameTable();
             this.mapSubscribers();
         },

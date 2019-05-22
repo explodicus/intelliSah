@@ -3,6 +3,7 @@
 namespace App\Events;
 
 use App\Entities\GameSession;
+use App\Entities\GameSubscription;
 use App\User;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
@@ -15,9 +16,9 @@ class SubscribeEvent implements ShouldBroadcast
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
     /**
-     * @var User
+     * @var GameSubscription
      */
-    public $user;
+    public $subscription;
 
     /**
      * @var GameSession
@@ -26,12 +27,12 @@ class SubscribeEvent implements ShouldBroadcast
 
     /**
      * SubscribeEvent constructor.
-     * @param User $user
+     * @param GameSubscription $subscription
      * @param GameSession $session
      */
-    public function __construct(User $user, GameSession $session)
+    public function __construct(GameSubscription $subscription, GameSession $session)
     {
-        $this->user = $user;
+        $this->subscription = $subscription;
         $this->session = $session;
     }
 

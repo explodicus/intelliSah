@@ -20,7 +20,7 @@ class GameSessionObserver
             $subscription = GameSubscription::find($session->current_subscription_id);
             foreach (AIHandler::BOT_LEVELS as $level => $bots) {
                 if (in_array($subscription->user->name, $bots)) {
-                    BotAction::dispatch($subscription)->delay(now()->addSeconds(0.5));
+                    BotAction::dispatch($subscription)->delay(now()->addSeconds(1));
                     break;
                 }
             }

@@ -27,7 +27,7 @@ class GameSessionController extends Controller
      */
     public function index()
     {
-        $sessions = GameSession::all();
+        $sessions = GameSession::query()->orderByDesc('id')->get();
 
         return view('sessions.index', [
             'sessions' => $sessions,
@@ -113,7 +113,7 @@ class GameSessionController extends Controller
                 $subscription->save();
                 $otherSubscriptions->push($subscription);
 
-                broadcast(new SubscribeEvent($botUser, $session))->toOthers();
+                broadcast(new SubscribeEvent($subscription, $session))->toOthers();
             });
 
         if ($session->subscriptions->count() === 4) {
@@ -156,7 +156,8 @@ class GameSessionController extends Controller
         $subscription->save();
         $otherSubscriptions->push($subscription);
 
-        broadcast(new SubscribeEvent(Auth::user(), $session))->toOthers();
+        $subscription->user;
+        broadcast(new SubscribeEvent($subscription, $session))->toOthers();
 
         if ($session->subscriptions->count() === 4) {
             $session->current_subscription_id = $session->subscriptions[0]->id;
@@ -180,6 +181,6 @@ class GameSessionController extends Controller
      */
     public function subscribers(GameSession $session)
     {
-        return response()->json($session->subscribers);
+        return response()->json($session->subscriptions()->with('user')->get());
     }
 }

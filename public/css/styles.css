@@ -1,3 +1,23 @@
+.bg-side-1 {
+	background-color: black;
+	color: white;
+}
+
+.bg-side-2 {
+	background-color: blue;
+	color: white;
+}
+
+.bg-side-3 {
+	background-color: white;
+	color: black;
+}
+
+.bg-side-4 {
+	background-color: #721c24;
+	color: white;
+}
+
 .styledGame {
 	margin: 20px auto;
 }

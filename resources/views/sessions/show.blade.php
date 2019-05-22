@@ -28,9 +28,10 @@
                                 <label class="custom-control-inline">Initiator:</label>
                                 <input class="form-control" disabled value="{{ $sessionUser->name }}">
                             </div>
-                            <div class="col-4 form-inline">
-                                @if ($session->subscriptions->count() && $session->status == 0 && $sessionUser->id === $currentUser->id)
-                                    <form class="form-inline" method="POST" action="{{ route('session.subscribe.bots', $session) }}">
+                            @if ($session->subscriptions->count() && $session->status == 0 && $sessionUser->id === $currentUser->id)
+                                <div class="col-4 form-inline">
+                                    <form class="form-inline" method="POST"
+                                          action="{{ route('session.subscribe.bots', $session) }}">
                                         @csrf
                                         <button class="btn btn-primary mr-3">Start game with bots</button>
                                         <select name="bot_level" class="form-control">
@@ -39,8 +40,9 @@
                                             <option value="3">Bots level 3</option>
                                         </select>
                                     </form>
-                                @endif
-                            </div>
+                                </div>
+                            @endif
+                            <current-playing :subscriber="{{ json_encode($session->currentSubscription->user) }}"></current-playing>
                         </div>
                         <div class="row">
                             <game-table

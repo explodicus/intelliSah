@@ -5,6 +5,7 @@ namespace App\Providers\Helper;
 
 
 use App\Entities\GameSession;
+use App\Entities\GameSubscription;
 use Illuminate\Support\Facades\Log;
 
 class AIHandler
@@ -53,7 +54,7 @@ class AIHandler
      * @return mixed
      * @throws \Exception
      */
-    public function canonical(GameSession $gameSession)
+    protected function canonical(GameSession $gameSession)
     {
         $canonical = array_reduce(range(0, 11), function ($carry, $row) {
             $carry[$row] = [];
@@ -73,7 +74,25 @@ class AIHandler
             }
         }
 
-        return $canonical;
+        return [
+            'board' => $canonical,
+            'level' => (int)$this->getBotLevel($gameSession->currentSubscription) + 1,
+        ];
+    }
+
+    /**
+     * @param GameSubscription $subscription
+     * @return int
+     */
+    protected function getBotLevel(GameSubscription $subscription)
+    {
+        foreach (self::BOT_LEVELS as $level => $bots) {
+            if (in_array($subscription->user->name, $bots)) {
+                return $level;
+            }
+        }
+
+        return 0;
     }
 
     /**

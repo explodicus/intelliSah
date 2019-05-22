@@ -1,7 +1,7 @@
 <template>
     <div class="float-right" v-on:update-subscribers="updateSubscribers()">
-        <span class="badge badge-success mr-1" v-for="subscriber in subscribers">
-            {{ subscriber.name }}
+        <span :class="'bg-side-' + subscription.side" class="badge mr-1" v-for="subscription in subscriptions">
+            {{ subscription.user.name }}
         </span>
     </div>
 </template>
@@ -9,7 +9,7 @@
 <script>
     export default {
         data: () => ({
-           subscribers: [],
+           subscriptions: [],
         }),
 
         props: {
@@ -25,7 +25,7 @@
             this.updateSubscribers();
             Echo.private(`sah.subscriber.${this.gameSession}`)
                 .listen('SubscribeEvent', (e) => {
-                    this.subscribers.push(e.user);
+                    this.subscriptions.push(e);
                     VueEvents.$emit('notification', {
                         text: `User '${e.user.name}' subscribed to this game.`
                     });
@@ -35,7 +35,7 @@
         methods: {
             updateSubscribers() {
                 axios.get(this.subscribersUri).then(response => {
-                    this.subscribers = response.data;
+                    this.subscriptions = response.data;
                 });
             }
         }

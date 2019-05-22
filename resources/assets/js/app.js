@@ -18,9 +18,10 @@ window.VueEvents = new Vue({});
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
 
-Vue.component('subscribers', require('./components/Subscribers.vue'));
-Vue.component('notification', require('./components/Notification.vue'));
-Vue.component('game-table', require('./components/GameTable.vue'));
+Vue.component('subscribers', require('./components/Subscribers.vue').default);
+Vue.component('notification', require('./components/Notification.vue').default);
+Vue.component('game-table', require('./components/GameTable.vue').default);
+Vue.component('current-playing', require('./components/CurrentPlaying.vue').default);
 
 const app = new Vue({
     el: '#app'

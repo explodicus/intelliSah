@@ -43,10 +43,6 @@ class BotAction implements ShouldQueue
         }
 
         $nextQuery = $aiHandler->nextQuery($session);
-//        if (!$nextQuery) {
-//            throw new \Exception("AI can't handle session {$session->id} for bot {$subscription->user->id}");
-//        }
-
         list ($positionFrom, $positionTo) = $nextQuery;
         if (!$gameProvider->performAction($session, $positionFrom, $positionTo)) {
             throw new \Exception("Unexpected position");

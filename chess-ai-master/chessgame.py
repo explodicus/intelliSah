@@ -2,14 +2,13 @@
 import math
 import itertools
 import json
-import sys
 
 from game import RulesEnforcer
 from ai import ChessAi
 
 
 class ChessGame(RulesEnforcer,ChessAi):
-    def __init__(self, ai_depth, invalidPQ):
+    def __init__(self, payload, invalidPQ):
         """
         Creates a chessboard with pieces
         
@@ -37,11 +36,11 @@ class ChessGame(RulesEnforcer,ChessAi):
 
         """
         
-        ChessAi.__init__(self, ai_depth)
+        ChessAi.__init__(self, payload['level'])
         RulesEnforcer.__init__(self)
         #super(ChessGame, self).__init__()
 
-        self.ai_depth = ai_depth
+        self.ai_depth = payload['level']
 
         chessboard1 = [["0-0"]*12 for i in range(12)]
 
@@ -71,17 +70,9 @@ class ChessGame(RulesEnforcer,ChessAi):
         #initialize the chessboard
         self.chessboard = [["0-0"]*8 for i in range(8)]
 
-        original = sys.argv[1]
-        # original = '[{"9":{"code":"rook","ai":true,"position":[0,9]},"8":{"code":"knight","ai":true,"position":[0,8]},"7":{"code":"bishop","ai":true,"position":[0,7]},"6":{"code":"queen","ai":true,"position":[0,6]},"5":{"code":"king","ai":true,"position":[0,5]},"4":{"code":"bishop","ai":true,"position":[0,4]},"3":{"code":"knight","ai":true,"position":[0,3]},"2":{"code":"rook","ai":true,"position":[0,2]}},{"8":{"code":"pawn","ai":true,"position":[1,8]},"7":{"code":"pawn","ai":true,"position":[1,7]},"6":{"code":"pawn","ai":true,"position":[1,6]},"5":{"code":"pawn","ai":true,"position":[1,5]},"4":{"code":"pawn","ai":true,"position":[1,4]},"3":{"code":"pawn","ai":true,"position":[1,3]},"2":{"code":"pawn","ai":true,"position":[1,2]}},{"0":{"code":"rook","ai":false,"position":[2,0]},"1":{"code":"pawn","ai":false,"position":[2,1]},"11":{"code":"rook","ai":false,"position":[2,11]},"10":{"code":"pawn","ai":true,"position":[2,10]}},{"0":{"code":"knight","ai":false,"position":[3,0]},"1":{"code":"pawn","ai":false,"position":[3,1]},"11":{"code":"knight","ai":false,"position":[3,11]},"10":{"code":"pawn","ai":false,"position":[3,10]}},{"0":{"code":"bishop","ai":false,"position":[4,0]},"1":{"code":"pawn","ai":false,"position":[4,1]},"11":{"code":"bishop","ai":false,"position":[4,11]},"10":{"code":"pawn","ai":false,"position":[4,10]}},{"0":{"code":"queen","ai":false,"position":[5,0]},"1":{"code":"pawn","ai":false,"position":[5,1]},"11":{"code":"queen","ai":false,"position":[5,11]},"10":{"code":"pawn","ai":false,"position":[5,10]}},{"0":{"code":"king","ai":false,"position":[6,0]},"1":{"code":"pawn","ai":false,"position":[6,1]},"11":{"code":"king","ai":false,"position":[6,11]},"10":{"code":"pawn","ai":false,"position":[6,10]}},{"8":{"code":"pawn","ai":false,"position":[7,8]},"3":{"code":"pawn","ai":false,"position":[7,3]},"0":{"code":"bishop","ai":false,"position":[7,0]},"11":{"code":"bishop","ai":false,"position":[7,11]}},{"8":{"code":"pawn","ai":false,"position":[8,8]},"0":{"code":"knight","ai":false,"position":[8,0]},"1":{"code":"pawn","ai":false,"position":[8,1]},"11":{"code":"knight","ai":false,"position":[8,11]},"10":{"code":"pawn","ai":false,"position":[8,10]}},{"0":{"code":"rook","ai":false,"position":[9,0]},"1":{"code":"pawn","ai":false,"position":[9,1]},"11":{"code":"rook","ai":false,"position":[9,11]},"10":{"code":"pawn","ai":false,"position":[9,10]}},{"9":{"code":"pawn","ai":false,"position":[10,9]},"7":{"code":"pawn","ai":false,"position":[10,7]},"6":{"code":"pawn","ai":false,"position":[10,6]},"5":{"code":"pawn","ai":false,"position":[10,5]},"4":{"code":"pawn","ai":false,"position":[10,4]},"3":{"code":"pawn","ai":false,"position":[10,3]},"2":{"code":"pawn","ai":false,"position":[10,2]}},{"9":{"code":"rook","ai":false,"position":[11,9]},"8":{"code":"knight","ai":false,"position":[11,8]},"7":{"code":"bishop","ai":false,"position":[11,7]},"6":{"code":"queen","ai":false,"position":[11,6]},"5":{"code":"king","ai":false,"position":[11,5]},"4":{"code":"bishop","ai":false,"position":[11,4]},"3":{"code":"knight","ai":false,"position":[11,3]},"2":{"code":"rook","ai":false,"position":[11,2]}}]'
-
-        y = json.loads(original)
-        
-
+        y =  payload['board']
         for row in y:
-            if row == []:
-                continue
-
-            for column, values in row.items():
+            for column, values in row.items() if type(row) is dict else enumerate(row):
                 if values['ai'] == True:
                     fill('b', values['code'], values['position'])
                 else:
@@ -100,19 +91,25 @@ class ChessGame(RulesEnforcer,ChessAi):
         self.finalQ = 0
         for p in range(4):
             for q in range(4):
-                counter = 0
-                hasAiPiece = False
-                for i in range(8):
-                    for j in range(8):
-                        if okPQ(i, j):
+                if okPQ(p, q):
+                    counter = 0
+                    hasAiPiece = False
+                    hasKing = False
+                    hasOpponentPiece = False
+                    for i in range(8):
+                        for j in range(8):
                             if chessboard1[i+p][j+q] != '0-0':
                                 counter += 1
                             if chessboard1[i+p][j+q][0] == 'b':
                                 hasAiPiece = True
-                if counter > maxCounter and hasAiPiece:
-                    maxCounter = counter
-                    self.finalP = p
-                    self.finalQ = q
+                            if chessboard1[i+p][j+q][2] == 'k' and chessboard1[i+p][j+q][0] == 'w':
+                                hasKing = True
+                            if chessboard1[i+p][j+q][0] == 'w':
+                                hasOpponentPiece = True
+                    if counter > maxCounter and hasAiPiece and hasKing and hasOpponentPiece:
+                        maxCounter = counter
+                        self.finalP = p
+                        self.finalQ = q
 
         for i in range(8):
             for j in range(8):
