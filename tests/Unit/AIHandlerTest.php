@@ -24,4 +24,27 @@ class AIHandlerTest extends TestCase
         $this->assertArrayHasKey(0, $result);
         $this->assertArrayHasKey(1, $result);
     }
+
+    public function testPerformance()
+    {
+        $handler = new AIHandler();
+
+        $time = time();
+        $session = GameSession::find(3);
+        $handler->nextQuery($session);
+        $perf1 = time() - $time;
+        $this->assertTrue($perf1 <= 1);
+
+        $time = time();
+        $session = GameSession::find(5);
+        $handler->nextQuery($session);
+        $perf2 = time() - $time;
+        $this->assertTrue($perf2 <= 2);
+
+        $time = time();
+        $session = GameSession::find(6);
+        $handler->nextQuery($session);
+        $perf3 = time() - $time;
+        $this->assertTrue($perf3 <= 5);
+    }
 }
