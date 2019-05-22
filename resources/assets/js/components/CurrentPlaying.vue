@@ -16,7 +16,7 @@
         },
 
         mounted() {
-            this.name = this.subscriber.name;
+            this.name = this.subscriber ? this.subscriber.name : '';
             VueEvents.$on('current-subscription', payload => {
                 this.name = payload.name;
             })

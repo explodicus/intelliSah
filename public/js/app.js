@@ -1782,7 +1782,7 @@ __webpack_require__.r(__webpack_exports__);
   mounted: function mounted() {
     var _this = this;
 
-    this.name = this.subscriber.name;
+    this.name = this.subscriber ? this.subscriber.name : '';
     VueEvents.$on('current-subscription', function (payload) {
       _this.name = payload.name;
     });

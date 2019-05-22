@@ -42,7 +42,7 @@
                                     </form>
                                 </div>
                             @endif
-                            <current-playing :subscriber="{{ json_encode($session->currentSubscription->user) }}"></current-playing>
+                            <current-playing :subscriber="{{ json_encode(@$session->currentSubscription->user) }}"></current-playing>
                         </div>
                         <div class="row">
                             <game-table
